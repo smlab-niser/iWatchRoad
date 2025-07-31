@@ -75,3 +75,6 @@ Thumbs.db
 # Backup files
 *.backup
 *.bak
+
+#Weights
+backend/dashcam_processor/weights/
