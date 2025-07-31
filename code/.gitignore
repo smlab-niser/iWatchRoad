@@ -76,5 +76,32 @@ Thumbs.db
 *.backup
 *.bak
 
-#Weights
-backend/dashcam_processor/weights/
+backend/dashcam_processor/Weights/
+backend/dashcam_processor/git/
+backend/dashcam_processor/Media/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Distribution / packaging
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
