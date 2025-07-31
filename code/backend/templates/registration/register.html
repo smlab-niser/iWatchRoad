@@ -1,0 +1,91 @@
+{% extends 'registration/base.html' %}
+
+{% block title %}Register - RoadWatch Admin{% endblock %}
+
+{% block header %}Create Admin Account{% endblock %}
+{% block subheader %}Register with your email to access the admin dashboard{% endblock %}
+
+{% block content %}
+<form method="post" novalidate>
+    {% csrf_token %}
+    
+    <div class="mb-3">
+        <label for="{{ form.username.id_for_label }}" class="form-label">
+            <i class="fas fa-user me-2"></i>Username
+        </label>
+        {{ form.username }}
+        {% if form.username.help_text %}
+            <div class="form-text">{{ form.username.help_text }}</div>
+        {% endif %}
+        {% if form.username.errors %}
+            <div class="text-danger small">
+                {% for error in form.username.errors %}
+                    <div>{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="mb-3">
+        <label for="{{ form.email.id_for_label }}" class="form-label">
+            <i class="fas fa-envelope me-2"></i>Email Address
+        </label>
+        {{ form.email }}
+        {% if form.email.help_text %}
+            <div class="form-text">{{ form.email.help_text }}</div>
+        {% endif %}
+        {% if form.email.errors %}
+            <div class="text-danger small">
+                {% for error in form.email.errors %}
+                    <div>{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="mb-3">
+        <label for="{{ form.password1.id_for_label }}" class="form-label">
+            <i class="fas fa-lock me-2"></i>Password
+        </label>
+        {{ form.password1 }}
+        {% if form.password1.help_text %}
+            <div class="form-text">{{ form.password1.help_text }}</div>
+        {% endif %}
+        {% if form.password1.errors %}
+            <div class="text-danger small">
+                {% for error in form.password1.errors %}
+                    <div>{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="mb-4">
+        <label for="{{ form.password2.id_for_label }}" class="form-label">
+            <i class="fas fa-lock me-2"></i>Confirm Password
+        </label>
+        {{ form.password2 }}
+        {% if form.password2.help_text %}
+            <div class="form-text">{{ form.password2.help_text }}</div>
+        {% endif %}
+        {% if form.password2.errors %}
+            <div class="text-danger small">
+                {% for error in form.password2.errors %}
+                    <div>{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="d-grid mb-3">
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-user-plus me-2"></i>Create Admin Account
+        </button>
+    </div>
+</form>
+
+<div class="auth-links">
+    <p>Already have an account? <a href="{% url 'accounts:login' %}">Login here</a></p>
+    <p><a href="/admin/">Go to Admin Dashboard</a></p>
+</div>
+{% endblock %}

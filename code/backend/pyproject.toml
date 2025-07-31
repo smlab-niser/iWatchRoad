@@ -1,0 +1,27 @@
+[project]
+name = "backend"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "django>=5.2.4",
+    "django-cors-headers>=4.7.0",
+    "django-filter>=25.1",
+    "djangorestframework>=3.16.0",
+    "pillow>=11.3.0",
+    "dj-database-url>=2.2.0",
+    "gunicorn>=21.2.0",
+    "whitenoise>=6.6.0",
+    "waitress>=3.0.0", # Windows-compatible WSGI server
+    # Dashcam processing dependencies
+    "opencv-python>=4.8.0",
+    "pandas>=2.0.0",
+    "numpy>=1.24.0",
+    "ultralytics>=8.0.0",
+    "easyocr>=1.7.0",
+    "geopy>=2.3.0",
+    "torch>=2.0.0",
+    "torchvision>=0.15.0",
+    "cvzone>=1.6.1",
+]

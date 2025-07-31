@@ -1,0 +1,29 @@
+cropped_videos
+cropped_videos/frame_output
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+# VSCode config
+.vscode/
+# Environment files
+.env
+*.env
+# Conda virtual env
+env/
+venv/
+Media
+git
+frames_output_100
+sam_road_outputs
+output_ocr/
+# Model weights (too large for GitHub)
+Weights/best_27062025.pt
+20250528110347_1800.git
+sam_implement.py
+sam_checkpoints/
+merge_ocr_gps.py
+merge_ocr_gps_copy.py
+merge_ocr_gps copy.py
+merge_ocr_gps_copy copy.py
+sam_checkpoints/

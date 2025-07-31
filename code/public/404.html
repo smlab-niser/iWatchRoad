@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="./vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RoadWatch - Real-time Pothole Monitoring System</title>
+  <meta name="description"
+    content="Interactive pothole tracking application for monitoring and reporting road conditions in real-time" />
+  <script>
+    // GitHub Pages SPA redirect
+    // Store the path and redirect to the base URL
+    sessionStorage.setItem('redirectPath', location.pathname);
+    location.replace(location.origin + location.pathname.split('/')[1] + '/');
+  </script>
+</head>
+
+<body>
+  <div id="root"></div>
+</body>
+
+</html>

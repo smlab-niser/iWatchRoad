@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoadWatch - Admin Registration</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            padding-top: 50px;
+        }
+        .welcome-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            padding: 40px;
+            text-align: center;
+        }
+        .pothole-icon {
+            font-size: 4rem;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        .btn-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 15px 30px;
+            font-weight: 600;
+            font-size: 16px;
+            margin: 10px;
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+        .btn-custom:hover {
+            transform: translateY(-1px);
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            color: white;
+        }
+        .btn-outline-custom {
+            border: 2px solid #667eea;
+            color: #667eea;
+            background: transparent;
+            border-radius: 10px;
+            padding: 15px 30px;
+            font-weight: 600;
+            font-size: 16px;
+            margin: 10px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s;
+        }
+        .btn-outline-custom:hover {
+            background: #667eea;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="welcome-card">
+                    <div class="pothole-icon">
+                        <i class="fas fa-road"></i>
+                    </div>
+                    <h1 class="mb-4">RoadWatch Admin</h1>
+                    
+                    {% if user.is_authenticated %}
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Welcome back, <strong>{{ user.username }}</strong>!
+                        </div>
+                        
+                        {% if user.is_staff %}
+                            <p class="lead mb-4">You have admin access. You can manage pothole reports and system data.</p>
+                            <a href="/admin/" class="btn-custom">
+                                <i class="fas fa-tachometer-alt me-2"></i>Access Admin Dashboard
+                            </a>
+                        {% else %}
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Your account doesn't have admin privileges yet. Please contact an administrator.
+                            </div>
+                        {% endif %}
+                        
+                        <div class="mt-4">
+                            <a href="/accounts/logout/" class="btn-outline-custom">
+                                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                            </a>
+                        </div>
+                    {% else %}
+                        <p class="lead mb-4">Register with your email to gain access to the admin dashboard where you can manage pothole reports and system data.</p>
+                        
+                        <div class="mb-4">
+                            <h5>What you can do as an admin:</h5>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-eye text-primary me-2"></i>View and manage all pothole reports</li>
+                                <li><i class="fas fa-edit text-primary me-2"></i>Update pothole status and severity</li>
+                                <li><i class="fas fa-chart-bar text-primary me-2"></i>Access analytics and statistics</li>
+                                <li><i class="fas fa-upload text-primary me-2"></i>Import data from CSV files</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <a href="/accounts/register/" class="btn-custom">
+                                <i class="fas fa-user-plus me-2"></i>Register for Admin Access
+                            </a>
+                            <a href="/accounts/login/" class="btn-outline-custom">
+                                <i class="fas fa-sign-in-alt me-2"></i>Login
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-8 col-lg-6">
+                <div class="text-center text-white">
+                    <p><a href="http://localhost:5173" class="text-white">View Frontend Application</a> | <a href="/api/potholes/" class="text-white">API Documentation</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
