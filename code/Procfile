@@ -1,2 +1,0 @@
-# Deploy to Railway/Heroku with production settings
-web: cd backend && uv run python manage.py migrate --settings=pothole_tracker.production_settings && uv run python manage.py collectstatic --noinput --settings=pothole_tracker.production_settings && uv run gunicorn --bind 0.0.0.0:$PORT pothole_tracker.wsgi:application --env DJANGO_SETTINGS_MODULE=pothole_tracker.production_settings
