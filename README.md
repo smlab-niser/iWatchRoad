@@ -1,5 +1,6 @@
 # RoadWatch
-
+[![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org)
 ![RoadWatch Main Interface](images/Main.png)
 
 ## Overview
@@ -191,15 +192,29 @@ roadwatch/
 └── README.md
 ```
 
-<!-- ## Contributing
+## Contributing
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request -->
+5. Open a Pull Request
 
-<!-- ## License
-This project is licensed under the MIT License - see the LICENSE file for details. -->
+## License
+This work is licensed under a
+[Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License][cc-by-nc-sa].
+
+[![CC BY-NC-SA 4.0][cc-by-nc-sa-image]][cc-by-nc-sa]
+
+[cc-by-nc-sa]: http://creativecommons.org/licenses/by-nc-sa/4.0/
+[cc-by-nc-sa-image]: https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png
+[cc-by-nc-sa-shield]: https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg
+
+See the [LICENSE](LICENSE) file for details.
+
+## 👥 Development Team 
+
+- **[Subhankar Mishra's Lab](https://www.niser.ac.in/~smishra/)** - NISER ([GitHub](https://github.com/smlab-niser))
+- **Lab Project Website**: [NISER SMLab](https://smlab.niser.ac.in)
 
 ## Support
 For questions and support, please open an issue on GitHub or contact the development team.
