@@ -9,7 +9,6 @@ RoadWatch is an intelligent road infrastructure monitoring system that combines 
 
 > [!important]
 > For the RoadWatch site:  https://smlab.niser.ac.in/project/roadwatch.
-
 > For the dataset:  www.kaggle.com/datasets/rishirajsahoo/roadwatch.
 
 ### Key Features
