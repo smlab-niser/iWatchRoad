@@ -1,15 +1,15 @@
-# RoadWatch
+# iWatchRoad
 [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org)
-![RoadWatch Main Interface](images/Main.png)
+![iWatchRoad Main Interface](images/Main.png)
 
 ## Overview
 
-RoadWatch is an intelligent road infrastructure monitoring system that combines computer vision with web based mapping technology. The system automatically detects and tracks potholes using dashcam footage and provides a comprehensive web interface for monitoring and managing road conditions.
+iWatchRoad is an intelligent road infrastructure monitoring system that combines computer vision with web based mapping technology. The system automatically detects and tracks potholes using dashcam footage and provides a comprehensive web interface for monitoring and managing road conditions.
 
 > [!important]
-> For the RoadWatch site:  https://smlab.niser.ac.in/project/roadwatch.<br>
-> For the dataset:  www.kaggle.com/datasets/rishirajsahoo/roadwatch.
+> For the iWatchRoad site:  https://smlab.niser.ac.in/project/iwatchroad.<br>
+> For the dataset:  www.kaggle.com/datasets/surbhisaswatimohanty/bharatpothole.
 
 ### Key Features
 
@@ -182,7 +182,7 @@ The system provides RESTful APIs for integration with other systems:
 
 ## Project Structure
 ```
-roadwatch/
+iwatchroad/
 ├── images/                     # Documentation images
 ├── code/
 │   ├── backend/               # Django backend
