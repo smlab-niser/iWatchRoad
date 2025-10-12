@@ -48,11 +48,19 @@ class Pothole(models.Model):
         help_text="Image of the pothole"
     )
     
-    # Base64 encoded image from CSV frames
+    # Frame image file (preferred storage method)
+    frame_image = models.ImageField(
+        upload_to='pothole_frames/',
+        blank=True,
+        null=True,
+        help_text="Frame image file"
+    )
+    
+    # Base64 encoded image from CSV frames (deprecated, for backward compatibility)
     frame_image_base64 = models.TextField(
         blank=True,
         null=True,
-        help_text="Base64 encoded image data from CSV frame"
+        help_text="Base64 encoded image data from CSV frame (deprecated)"
     )
     
     # Frame number for reference
