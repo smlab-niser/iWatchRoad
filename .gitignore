@@ -1,2 +1,473 @@
+# =============================================================================
+# iWatchRoadv2 PROJECT - COMPREHENSIVE GITIGNORE
+# =============================================================================
+# This covers: React/Vite frontend, Django backend, Python ML/CV, Node.js
+# =============================================================================
+
+# Project-specific files
 debug.log
 code/backend/pothole_gps_final.csv
+
+# =============================================================================
+# PYTHON / DJANGO BACKEND
+# =============================================================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+*.so
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+database2.sqlite3
+media/
+staticfiles/
+
+# Flask stuff
+instance/
+.webassets-cache
+
+# Scrapy stuff
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+.pybuilder/
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# poetry
+poetry.lock
+
+# pdm
+.pdm.toml
+.pdm-python
+.pdm-build/
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+roadwatch-env/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# =============================================================================
+# MACHINE LEARNING / COMPUTER VISION
+# =============================================================================
+
+# Model weights and checkpoints (too large for git)
+*.pt
+*.pth
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+*.joblib
+*.model
+*.weights
+Weights/
+weights/
+checkpoints/
+sam_checkpoints/
+models/
+
+# Training outputs
+runs/
+wandb/
+logs/
+tensorboard/
+mlruns/
+
+# Dataset files
+*.csv
+*.json
+*.xml
+*.txt
+*.tsv
+!requirements.txt
+!README.txt
+
+# Video/Image processing outputs
+cropped_videos/
+frames_output/
+frame_output/
+frames_output_100/
+Media/
+media/
+output_ocr/
+sam_road_outputs/
+pothole_frames/
+
+# Temporary processing files
+temp/
+tmp/
+*.temp
+*.tmp
+
+# =============================================================================
+# NODE.JS / REACT / VITE FRONTEND
+# =============================================================================
+
+# Dependencies
+node_modules/
+jspm_packages/
+
+# Snowpack dependency directory
+web_modules/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional stylelint cache
+.stylelintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variable files
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# parcel-bundler cache
+.cache
+.parcel-cache
+
+# Next.js build output
+.next
+out
+
+# Nuxt.js build / generate output
+.nuxt
+dist
+
+# Gatsby files
+.cache/
+public
+
+# Vite
+dist/
+dist-ssr/
+*.local
+
+# Rollup.js default build output
+dist/
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# yarn v2
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# =============================================================================
+# LOGS
+# =============================================================================
+
+# General logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+gunicorn_*.log
+
+# =============================================================================
+# OPERATING SYSTEM
+# =============================================================================
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# =============================================================================
+# IDEs AND EDITORS
+# =============================================================================
+
+# Visual Studio Code
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Eclipse
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# Nano
+*.save
+*.swp
+
+# Sublime Text
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+*.sublime-workspace
+*.sublime-project
+
+# Atom
+.atom/
+
+# =============================================================================
+# BACKUP AND TEMPORARY FILES
+# =============================================================================
+
+# Backup files
+*.backup
+*.bak
+*.old
+*.orig
+*.rej
+*.tmp
+
+# Temporary files
+*.temp
+*tmp*
+temp/
+tmp/
+
+# Archives (uncomment if you don't want to track archives)
+# *.7z
+# *.jar
+# *.rar
+# *.zip
+# *.tar
+# *.gz
+
+# =============================================================================
+# PROJECT SPECIFIC EXCLUSIONS
+# =============================================================================
+
+# Dashcam processor specific
+code/backend/dashcam_processor/cropped_videos/
+code/backend/dashcam_processor/Media/
+code/backend/dashcam_processor/git/
+code/backend/dashcam_processor/sam_road_outputs/
+code/backend/dashcam_processor/frames_output_100/
+code/backend/dashcam_processor/output_ocr/
+code/backend/dashcam_processor/Weights/
+code/backend/dashcam_processor/sam_checkpoints/
+
+# Specific files to ignore
+code/backend/dashcam_processor/best_27062025.pt
+code/backend/dashcam_processor/20250528110347_1800.git
+code/backend/dashcam_processor/sam_implement.py
+code/backend/dashcam_processor/merge_ocr_gps.py
+code/backend/dashcam_processor/merge_ocr_gps_copy.py
+code/backend/dashcam_processor/merge_ocr_gps\ copy.py
+code/backend/dashcam_processor/merge_ocr_gps_copy\ copy.py
+
+# Sample data files
+code/backend/sample_data.csv
+code/backend/pothole_gps_final.csv
+
+# Build outputs
+code/static/
+build/
+
+# Lock files (uncomment if you want to ignore them)
+# package-lock.json
+# yarn.lock
+# uv.lock

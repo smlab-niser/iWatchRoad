@@ -1,6 +1,7 @@
 from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q
 from .models import Pothole
@@ -8,8 +9,16 @@ from .serializers import (
     PotholeSerializer, 
     PotholeListSerializer, 
     PotholeCreateSerializer,
-    PotholeUpdateSerializer
+    PotholeUpdateSerializer,
+    PotholeFrameSerializer
 )
+
+
+class PotholePagination(PageNumberPagination):
+    """Custom pagination to limit memory usage."""
+    page_size = 50
+    page_size_query_param = 'page_size'
+    max_page_size = 100
 
 
 class PotholeViewSet(viewsets.ModelViewSet):
@@ -26,12 +35,15 @@ class PotholeViewSet(viewsets.ModelViewSet):
     - Search by area (GET /api/potholes/in_area/)
     """
     
-    queryset = Pothole.objects.all()
+    # Memory optimization: defer base64 field by default
+    queryset = Pothole.objects.defer('frame_image_base64').select_related()
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['status', 'severity', 'num_potholes']
     search_fields = ['description']
     ordering_fields = ['timestamp', 'created_at', 'num_potholes', 'severity']
     ordering = ['-timestamp']
+    # Temporarily disable pagination to fix frontend compatibility
+    # pagination_class = PotholePagination
     
     def get_serializer_class(self):
         """Return appropriate serializer based on action."""
@@ -41,6 +53,8 @@ class PotholeViewSet(viewsets.ModelViewSet):
             return PotholeCreateSerializer
         elif self.action in ['update', 'partial_update']:
             return PotholeUpdateSerializer
+        elif self.action == 'frame_image':
+            return PotholeFrameSerializer
         return PotholeSerializer
     
     def list(self, request, *args, **kwargs):
@@ -75,11 +89,6 @@ class PotholeViewSet(viewsets.ModelViewSet):
                     {"error": "Invalid coordinate values"}, 
                     status=status.HTTP_400_BAD_REQUEST
                 )
-        
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
         
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
@@ -149,21 +158,29 @@ class PotholeViewSet(viewsets.ModelViewSet):
     def frame_image(self, request, pk=None):
         """
         Get the frame image for a specific pothole.
-        Returns only the frame_image_base64 field for performance.
+        Returns frame_image file URL or base64 data if file not available.
         """
         try:
-            pothole = self.get_object()
-            if pothole.frame_image_base64:
-                return Response({
-                    'id': pothole.id,
-                    'frame_number': pothole.frame_number,
-                    'frame_image_base64': pothole.frame_image_base64
-                })
+            # Get only the required fields to minimize memory usage
+            pothole = Pothole.objects.only('id', 'frame_number', 'frame_image', 'frame_image_base64').get(pk=pk)
+            
+            response_data = {
+                'id': pothole.id,
+                'frame_number': pothole.frame_number,
+            }
+            
+            # Prefer frame_image file over base64
+            if pothole.frame_image:
+                response_data['frame_image_url'] = request.build_absolute_uri(pothole.frame_image.url)
+            elif pothole.frame_image_base64:
+                response_data['frame_image_base64'] = pothole.frame_image_base64
             else:
                 return Response(
                     {'error': 'No frame image available for this pothole'}, 
                     status=status.HTTP_404_NOT_FOUND
                 )
+            
+            return Response(response_data)
         except Pothole.DoesNotExist:
             return Response(
                 {'error': 'Pothole not found'}, 

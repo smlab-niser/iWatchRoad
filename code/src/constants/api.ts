@@ -16,4 +16,7 @@ export const API_ENDPOINTS = {
     potholesInArea: '/potholes/in_area/',
     potholesStats: '/potholes/stats/',
     updateStatus: (id: number) => `/potholes/${id}/update_status/`,
+    roadHealth: '/road-health/',
+    contractorMessages: '/contractor-messages/',
+    updateRoadHealth: '/road-health/update/',
 } as const;

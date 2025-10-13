@@ -3,15 +3,19 @@ import type { PotholeStatus, PotholeSeverity } from '../types';
 interface FilterPanelProps {
     onStatusFilter: (status: PotholeStatus | 'all') => void;
     onSeverityFilter: (severity: PotholeSeverity | 'all') => void;
+    onRoadHealthFilter: (enabled: boolean) => void;
     selectedStatus: PotholeStatus | 'all';
     selectedSeverity: PotholeSeverity | 'all';
+    roadHealthEnabled: boolean;
 }
 
 export const FilterPanel: React.FC<FilterPanelProps> = ({
     onStatusFilter,
     onSeverityFilter,
+    onRoadHealthFilter,
     selectedStatus,
-    selectedSeverity
+    selectedSeverity,
+    roadHealthEnabled
 }) => {
     const statusOptions: Array<PotholeStatus | 'all'> = ['all', 'reported', 'verified', 'in_progress', 'fixed', 'closed'];
     const severityOptions: Array<PotholeSeverity | 'all'> = ['all', 'low', 'medium', 'high', 'critical'];
@@ -53,6 +57,18 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                         </option>
                     ))}
                 </select>
+            </div>
+
+            <div className="filter-group">
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={roadHealthEnabled}
+                        onChange={(e) => onRoadHealthFilter(e.target.checked)}
+                        style={{ marginRight: '8px' }}
+                    />
+                    Road Health View
+                </label>
             </div>
         </div>
     );

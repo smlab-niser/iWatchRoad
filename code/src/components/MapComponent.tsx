@@ -6,6 +6,7 @@ import 'leaflet/dist/leaflet.css';
 import type { Location, PotholeStatus, PotholeSeverity } from '../types';
 import { MAP_CONFIG, TILE_LAYERS } from '../constants';
 import { PotholeMarkers } from './PotholeMarkers';
+import { RoadHealthOverlay } from './RoadHealthOverlay';
 
 // Fix for default markers in React-Leaflet
 import L from 'leaflet';
@@ -24,6 +25,7 @@ interface MapComponentProps {
   severityFilter?: PotholeSeverity | 'all';
   dateRange?: { start: Date; end: Date };
   refreshTrigger?: number;
+  roadHealthEnabled?: boolean;
 }
 
 // Component to handle map updates
@@ -46,7 +48,8 @@ export const MapComponent: React.FC<MapComponentProps> = ({
   statusFilter = 'all',
   severityFilter = 'all',
   dateRange,
-  refreshTrigger = 0
+  refreshTrigger = 0,
+  roadHealthEnabled = false
 }) => {
   const mapRef = useRef<LeafletMap>(null);
 
@@ -122,6 +125,9 @@ export const MapComponent: React.FC<MapComponentProps> = ({
           severityFilter={severityFilter}
           dateRange={dateRange}
         />
+
+        {/* Road Health Overlay */}
+        <RoadHealthOverlay enabled={roadHealthEnabled} />
 
         <MapController location={location} />
       </MapContainer>

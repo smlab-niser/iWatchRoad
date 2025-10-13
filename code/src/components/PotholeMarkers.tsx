@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Marker, Popup } from 'react-leaflet';
+import { Marker, Popup, Polyline } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
-import type { Pothole, PotholeSeverity, PotholeStatus } from '../types';
+import type { Pothole, PotholeSeverity, PotholeStatus, RoadSegment } from '../types';
 import { potholeApiService } from '../services/potholeApiService';
+import { govApiService } from '../services/govApiService';
 import { LoadingSpinner } from './LoadingSpinner';
 import { ErrorDisplay } from './ErrorDisplay';
+import { getClosestRoadSegment, getContractorColor } from '../utils/roadSegmentUtils';
 
 interface PotholeMarkersProps {
     refresh?: number; // Used to trigger refresh
@@ -111,6 +113,11 @@ export const PotholeMarkers: React.FC<PotholeMarkersProps> = ({
     const [frameImages, setFrameImages] = useState<Record<number, { frame_number?: number, frame_image_base64: string }>>({});
     const [loadingFrames, setLoadingFrames] = useState<Set<number>>(new Set());
 
+    // Road segment related state
+    const [roadSegments, setRoadSegments] = useState<RoadSegment[]>([]);
+    const [selectedRoadSegment, setSelectedRoadSegment] = useState<RoadSegment | null>(null);
+    const [highlightedPotholeId, setHighlightedPotholeId] = useState<number | null>(null);
+
     useEffect(() => {
         // Load all potholes data (without frame images for performance)
         const loadPotholes = async () => {
@@ -132,6 +139,40 @@ export const PotholeMarkers: React.FC<PotholeMarkersProps> = ({
 
         loadPotholes();
     }, [refresh]);
+
+    // Load road segments when component mounts
+    useEffect(() => {
+        const loadRoadSegments = async () => {
+            try {
+                const segments = await govApiService.getRoadSegments();
+                setRoadSegments(segments);
+                console.log(`Loaded ${segments.length} road segments for pothole analysis`);
+            } catch (err) {
+                console.error('Failed to load road segments:', err);
+                // Don't set error state here as road segments are optional
+            }
+        };
+
+        loadRoadSegments();
+    }, []);
+
+    // Function to handle pothole marker click and find associated road segment
+    const handlePotholeClick = (pothole: Pothole) => {
+        setHighlightedPotholeId(pothole.id);
+
+        const potholePoint: [number, number] = [parseFloat(pothole.latitude), parseFloat(pothole.longitude)];
+
+        // Find the closest road segment to this pothole
+        const closestResult = getClosestRoadSegment(potholePoint, roadSegments);
+
+        if (closestResult && closestResult.distance <= 100) { // Within 100 meters
+            setSelectedRoadSegment(closestResult.segment);
+            console.log(`Found road segment for pothole ${pothole.id}:`, closestResult.segment.contractor_name, `(${closestResult.distance.toFixed(1)}m away)`);
+        } else {
+            setSelectedRoadSegment(null);
+            console.log(`No road segment found near pothole ${pothole.id}`);
+        }
+    };
 
     // Function to load frame image on demand
     const loadFrameImage = async (potholeId: number, event?: React.MouseEvent) => {
@@ -207,6 +248,67 @@ export const PotholeMarkers: React.FC<PotholeMarkersProps> = ({
         return status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
     };
 
+    // Component to render road segment details
+    const RoadSegmentDetails: React.FC<{ segment: RoadSegment }> = ({ segment }) => (
+        <div style={{
+            marginTop: '16px',
+            padding: '12px',
+            backgroundColor: '#f1f5f9',
+            borderRadius: '8px',
+            border: `2px solid ${getContractorColor(segment.contractor_name)}`,
+        }}>
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                marginBottom: '8px',
+                gap: '8px'
+            }}>
+                <div style={{
+                    width: '12px',
+                    height: '12px',
+                    borderRadius: '50%',
+                    backgroundColor: getContractorColor(segment.contractor_name)
+                }}></div>
+                <strong style={{ color: '#1f2937', fontSize: '14px' }}>🛣️ Road Segment Details</strong>
+            </div>
+
+            <div style={{ fontSize: '12px', color: '#374151', lineHeight: '1.4' }}>
+                <div style={{ marginBottom: '4px' }}>
+                    <strong>👷 Contractor:</strong> {segment.contractor_name}
+                </div>
+                <div style={{ marginBottom: '4px' }}>
+                    <strong>🆔 Contractor ID:</strong> {segment.contractor_id}
+                </div>
+                <div style={{ marginBottom: '4px' }}>
+                    <strong>📧 Email:</strong> {segment.contractor_email}
+                </div>
+                <div style={{ marginBottom: '4px' }}>
+                    <strong>📞 Phone:</strong> {segment.contractor_phone}
+                </div>
+                <div style={{ marginBottom: '4px' }}>
+                    <strong>📅 Road Created:</strong> {new Date(segment.road_creation_date).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    })}
+                </div>
+                <div style={{ marginBottom: '4px' }}>
+                    <strong>🛡️ Warranty:</strong> {segment.warranty_period} months
+                </div>
+                <div style={{ marginBottom: '4px' }}>
+                    <strong>💰 Money Sanctioned:</strong> ₹{segment.money_sanctioned?.toLocaleString('en-IN') || 'N/A'}
+                </div>
+                {segment.created_by && (
+                    <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #d1d5db' }}>
+                        <div style={{ fontSize: '11px', color: '#6b7280' }}>
+                            <strong>Created by:</strong> {segment.created_by.full_name} ({segment.created_by.department || 'No Department'})
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+
     // Filter potholes based on current filters
     const filteredPotholes = potholes.filter(pothole => {
         // Status filter
@@ -249,6 +351,9 @@ export const PotholeMarkers: React.FC<PotholeMarkersProps> = ({
                         key={pothole.id}
                         position={[parseFloat(pothole.latitude), parseFloat(pothole.longitude)]}
                         icon={createPotholeIcon(pothole.severity, pothole.status)}
+                        eventHandlers={{
+                            click: () => handlePotholeClick(pothole),
+                        }}
                     >
                         <Popup maxWidth={400} minWidth={300} className="pothole-popup">
                             <div className="pothole-popup-content">
@@ -453,13 +558,56 @@ export const PotholeMarkers: React.FC<PotholeMarkersProps> = ({
                                         >
                                             📋 Copy Coordinates
                                         </button>
+
+                                        {/* Road Segment Button - Only show if a segment is found for this pothole */}
+                                        {highlightedPotholeId === pothole.id && selectedRoadSegment && (
+                                            <button
+                                                style={{
+                                                    background: getContractorColor(selectedRoadSegment.contractor_name),
+                                                    color: 'white',
+                                                    border: 'none',
+                                                    padding: '6px 12px',
+                                                    borderRadius: '6px',
+                                                    cursor: 'pointer',
+                                                    fontSize: '11px',
+                                                    flex: '1'
+                                                }}
+                                                onClick={() => {
+                                                    // Toggle showing road segment details in popup
+                                                    const existingDetails = document.querySelector('.road-segment-details');
+                                                    if (existingDetails) {
+                                                        existingDetails.remove();
+                                                    } else {
+                                                        // This will be handled by the RoadSegmentDetails component below
+                                                    }
+                                                }}
+                                            >
+                                                🛣️ Road Details
+                                            </button>
+                                        )}
                                     </div>
+
+                                    {/* Road Segment Details - Show when available and selected */}
+                                    {highlightedPotholeId === pothole.id && selectedRoadSegment && (
+                                        <RoadSegmentDetails segment={selectedRoadSegment} />
+                                    )}
                                 </div>
                             </div>
                         </Popup>
                     </Marker>
                 ))}
             </MarkerClusterGroup>
+
+            {/* Highlight selected road segment */}
+            {selectedRoadSegment && (
+                <Polyline
+                    positions={selectedRoadSegment.points}
+                    color={getContractorColor(selectedRoadSegment.contractor_name)}
+                    weight={6}
+                    opacity={0.8}
+                    dashArray="10, 5"
+                />
+            )}
 
             {loading && (
                 <div className="pothole-loading-indicator">

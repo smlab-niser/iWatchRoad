@@ -5,7 +5,7 @@ export const Footer: React.FC = () => {
         <footer className="app-footer">
             <div className="footer-content">
                 <div className="footer-left">
-                    <span>🕳️ iWatchRoad</span>
+                    <span>🕳️ iWatchRoadv2</span>
                     {/* <span className="footer-subtitle">Making roads safer, one report at a time</span> */}
                 </div>
 

@@ -39,7 +39,7 @@ STATICFILES_DIRS = [
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 import socket
 
@@ -88,10 +88,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders',
     'django_filters',
     'potholes',
     'accounts',
+    'government',
 ]
 
 MIDDLEWARE = [
@@ -132,8 +134,15 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+    },
+    'government': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'database2.sqlite3',
     }
 }
+
+# Database router for multi-database setup
+DATABASE_ROUTERS = ['pothole_tracker.db_router.DatabaseRouter']
 
 
 # Password validation
@@ -216,6 +225,11 @@ FILE_UPLOAD_PERMISSIONS = 0o644
 # Email settings for development (console backend for testing)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'admin@potholetracker.local'
+
+# Twilio SMS settings
+TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", "")
+TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", "")
+TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER", "")
 
 # Login/Logout URLs
 # LOGIN_URL = '/accounts/login/'

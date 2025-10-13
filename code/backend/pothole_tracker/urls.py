@@ -25,6 +25,7 @@ admin.site.site_url = "/" + settings.PRE_URL
 urlpatterns = [
     path(PRE_URL + 'admin/', admin.site.urls),
     path(PRE_URL + 'accounts/', include('accounts.urls')),
+    path(PRE_URL + 'gov-api/', include('government.urls')),
     path(PRE_URL + '', include('potholes.urls')),
 ]
 
