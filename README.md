@@ -1,15 +1,13 @@
 # iWatchRoad
+
 [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org)
-![iWatchRoad Main Interface](images/Main.png)
+
+![RoadWatch Main Interface](images/Main.png)
 
 ## Overview
 
-iWatchRoad is an intelligent road infrastructure monitoring system that combines computer vision with web based mapping technology. The system automatically detects and tracks potholes using dashcam footage and provides a comprehensive web interface for monitoring and managing road conditions.
-
-> [!important]
-> For the iWatchRoad site:  https://smlab.niser.ac.in/project/iwatchroad.<br>
-> For the dataset:  www.kaggle.com/datasets/surbhisaswatimohanty/bharatpothole.
+RoadWatch is an intelligent road infrastructure monitoring system that combines computer vision with web based mapping technology. The system automatically detects and tracks potholes using dashcam footage and provides a comprehensive web interface for monitoring and managing road conditions.
 
 ### Key Features
 
@@ -182,7 +180,7 @@ The system provides RESTful APIs for integration with other systems:
 
 ## Project Structure
 ```
-iwatchroad/
+roadwatch/
 ├── images/                     # Documentation images
 ├── code/
 │   ├── backend/               # Django backend
@@ -201,7 +199,7 @@ iwatchroad/
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+5. Open a Pull Request 
 
 ## License
 This work is licensed under a
@@ -214,11 +212,6 @@ This work is licensed under a
 [cc-by-nc-sa-shield]: https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg
 
 See the [LICENSE](LICENSE) file for details.
-
-## 👥 Development Team 
-
-- **[Subhankar Mishra's Lab](https://www.niser.ac.in/~smishra/)** - NISER ([GitHub](https://github.com/smlab-niser))
-- **Lab Project Website**: [NISER SMLab](https://smlab.niser.ac.in)
 
 ## Support
 For questions and support, please open an issue on GitHub or contact the development team.
