@@ -1,13 +1,13 @@
-# iWatchRoad
+# iWatchRoadv2
 
 [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org)
 
-![RoadWatch Main Interface](images/Main.png)
+![RoadWatch Main Interface](images/Mainv2.png)
 
 ## Overview
 
-RoadWatch is an intelligent road infrastructure monitoring system that combines computer vision with web based mapping technology. The system automatically detects and tracks potholes using dashcam footage and provides a comprehensive web interface for monitoring and managing road conditions.
+iWatchRoadv2 is an intelligent road infrastructure monitoring system that combines computer vision with web based mapping technology. The system automatically detects and tracks potholes using dashcam footage and provides a comprehensive web interface for monitoring and managing road conditions.
 
 ### Key Features
 
