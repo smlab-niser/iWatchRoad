@@ -2,12 +2,15 @@
 
 [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org)
+[![Version](https://img.shields.io/badge/Version-2.0-green.svg)](https://github.com/smlab-niser/iWatchRoad)
 
 ![RoadWatch Main Interface](images/Mainv2.png)
 
 ## Overview
 
-iWatchRoadv2 is an intelligent road infrastructure monitoring system that combines computer vision with web based mapping technology. The system automatically detects and tracks potholes using dashcam footage and provides a comprehensive web interface for monitoring and managing road conditions.
+iWatchRoadv2 is an intelligent road infrastructure monitoring system that combines computer vision with web based mapping technology. The system automatically detects and tracks potholes using dashcam footage and provides a comprehensive web interface for monitoring and managing road conditions and attaching the contract information for the road health and governance.
+
+> **Note**: This is the upgraded version of the original iWatchRoad system. For the previous version, please refer to the `iwatchroadv1` branch which contains the initial implementation and development history.
 
 ### Key Features
 
@@ -17,12 +20,42 @@ iWatchRoadv2 is an intelligent road infrastructure monitoring system that combin
 - **Computer Vision Pipeline**: Powered by OpenCV, CVZone, and Ultralytics for robust image processing
 - **OCR Processing**: Automatic text extraction using EasyOCR for additional context
 - **Machine Learning**: Advanced filtering and classification using scikit-learn and scipy
+- **Automated Grading**: Intelligent severity assessment (Low/Moderate/High) based on pothole dimensions
+- **Frame-by-Frame Analysis**: Comprehensive video processing with frame extraction and storage
+- **Batch Processing**: Support for bulk video upload and processing
 
 **🌐 Web Application:**
 - **Interactive Mapping**: Built with React, TypeScript, and Leaflet for dynamic map visualization
 - **Real-time Data**: Django REST Framework backend for seamless data management
 - **Responsive Design**: Modern React based frontend with clustering and filtering capabilities
 - **Data Analytics**: Comprehensive reporting and statistics for road authorities
+- **Advanced Filtering**: Multi-parameter filtering by date range, severity, location, and status
+- **Timeline Control**: Interactive timeline slider for temporal data exploration
+- **Location Search**: Intelligent location-based search and navigation
+- **Marker Clustering**: Smart clustering for optimal map performance with large datasets
+
+**🏛️ Government Integration:**
+- **Government Portal**: Dedicated interface for road authorities and contractors
+- **Contractor Management**: Road segment allocation and contractor assignment system
+- **Authentication System**: Secure login for government officials and authorized personnel
+- **Road Health Visualization**: Color-coded overlay showing road condition status
+- **Status Tracking**: Complete lifecycle management from detection to repair completion
+
+**📊 Data Management & Analytics:**
+- **Status Workflow**: Complete pothole lifecycle (Reported → Verified → In Progress → Fixed → Closed)
+- **Severity Classification**: Automated grading system with visual indicators
+- **Statistics Dashboard**: Real-time analytics with breakdown by severity, status, and location
+- **Export Capabilities**: CSV data export for reporting and external analysis
+- **Historical Data**: Comprehensive tracking of repairs and maintenance history
+- **Performance Metrics**: Detailed statistics for monitoring infrastructure health
+
+**🔧 Technical Features:**
+- **RESTful API**: Complete API suite for third-party integrations
+- **Image Storage**: Efficient frame image management with both file and base64 support
+- **Error Handling**: Comprehensive error reporting and user feedback systems
+- **Loading States**: Progressive loading with spinners and status indicators
+- **Responsive UI**: Mobile-friendly interface with adaptive layout
+- **Production Ready**: Gunicorn WSGI server configuration for deployment
 
 ## Technology Stack
 
@@ -181,17 +214,60 @@ The system provides RESTful APIs for integration with other systems:
 ## Project Structure
 ```
 roadwatch/
-├── images/                     # Documentation images
-├── code/
-│   ├── backend/               # Django backend
-│   │   ├── pothole_tracker/   # Main Django project
-│   │   ├── potholes/          # Potholes app
-│   │   ├── accounts/          # User management
-│   │   └── dashcam_processor/ # AI processing module
-│   ├── src/                   # React frontend source
-│   ├── public/                # Static assets
-│   └── package.json           # Node.js dependencies
-└── README.md
+├── README.md, LICENSE                  # Documentation & licensing
+├── images/ (screenshots), .github/, .vscode/  # Assets & config
+└── code/                               # Main application
+    ├── Frontend (React + TypeScript)
+    │   ├── package.json, vite.config.ts, tsconfig.json, eslint.config.js
+    │   ├── index.html, public/, dist/  # Entry point & static assets
+    │   └── src/
+    │       ├── main.tsx, App.tsx, *.css  # Core app files
+    │       ├── components/             # UI Components
+    │       │   ├── Map: MapComponent, PotholeMarkers, Timeline, LocationSearch
+    │       │   ├── UI: ControlPanel, FilterPanel, PotholeStats, Footer
+    │       │   ├── Gov: GovLoginModal, GovMapComponent, RoadHealthOverlay
+    │       │   └── Utils: UploadPage, LoadingSpinner, ErrorDisplay
+    │       ├── services/ (API clients), types/ (TypeScript definitions)
+    │       └── constants/ (config), utils/ (helpers)
+    └── Backend (Django)
+        ├── Core Files
+        │   ├── manage.py, pyproject.toml, requirements*.txt, uv.lock
+        │   ├── start_production.py, process_csv.py, restart_optimized.sh
+        │   └── .env, db.sqlite3, pothole_gps_final.csv
+        ├── Storage & Assets
+        │   ├── media/ (uploads), static/, staticfiles/ (collected)
+        │   ├── templates/ (Django HTML), logs/ (application logs)
+        │   └── gunicorn/ (WSGI server config)
+        ├── Django Apps
+        │   ├── pothole_tracker/        # Main project
+        │   │   └── settings.py, urls.py, wsgi.py, asgi.py, production_settings.py
+        │   ├── potholes/               # Core pothole functionality
+        │   │   └── models.py, views.py, serializers.py, admin.py, pagination.py
+        │   ├── accounts/               # User management
+        │   │   └── models.py, views.py, urls.py, admin.py
+        │   └── government/             # Government portal
+        │       └── models.py, views.py, urls.py
+        └── AI/ML Processing (dashcam_processor/)
+            ├── main.py (pipeline), yolo_detection.py, gps_parser.py
+            ├── ocr_processor.py, pothole_grading.py, blurring.py
+            └── setup.py, requirements.txt, README files
+```
+
+## Project Evolution
+
+### Version History
+- **iWatchRoadv2** (main branch) - Current enhanced version with improved UI, performance optimizations, and advanced features
+- **iWatchRoad** (iwatchroadv1 branch) - Original implementation with core functionality
+
+### Accessing Different Versions
+To explore the original iWatchRoad system:
+```bash
+git checkout iwatchroadv1
+```
+
+To return to the latest version:
+```bash
+git checkout main
 ```
 
 ## Contributing
