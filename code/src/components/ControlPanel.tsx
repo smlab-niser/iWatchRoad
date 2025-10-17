@@ -8,6 +8,8 @@ interface ControlPanelProps {
   onToggleRoads: () => void;
   onResetLocation: () => void;
   onNavigateToUpload?: () => void;
+  onNavigateToGovAuth?: () => void;
+  onNavigateToRoadHealth?: () => void;
   currentLocation: Location;
 }
 
@@ -18,6 +20,8 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   onToggleRoads,
   onResetLocation,
   onNavigateToUpload,
+  onNavigateToGovAuth,
+  onNavigateToRoadHealth,
   currentLocation
 }) => {
   return (
@@ -64,6 +68,50 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
               title="Upload dashcam videos for processing"
             >
               📹 Upload Videos
+            </button>
+          </div>
+        )}
+
+        {onNavigateToGovAuth && (
+          <div className="control-item">
+            <button
+              className="gov-segment-btn"
+              onClick={onNavigateToGovAuth}
+              title="Segment road and allocate contractor (Government users only)"
+              style={{
+                padding: '10px 16px',
+                fontWeight: 'bold',
+                background: '#1976d2',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                width: '100%'
+              }}
+            >
+              🏛️ Government Authorization
+            </button>
+          </div>
+        )}
+
+        {onNavigateToRoadHealth && (
+          <div className="control-item">
+            <button
+              className="road-health-btn"
+              onClick={onNavigateToRoadHealth}
+              title="View road health status based on pothole density and warranty"
+              style={{
+                padding: '10px 16px',
+                fontWeight: 'bold',
+                background: '#16a34a',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                width: '100%'
+              }}
+            >
+              🏥 Road Health
             </button>
           </div>
         )}

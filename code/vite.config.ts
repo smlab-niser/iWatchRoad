@@ -21,34 +21,73 @@ const getNetworkIP = () => {
 
 // Get current network IP for display purposes
 const networkIPs = getNetworkIP();
-const primaryIP = networkIPs[0] || 'localhost';
 
 console.log(`🌐 Available network IPs: ${networkIPs.join(', ')}`);
-console.log(`🔧 Primary IP for backend: ${primaryIP}:8000`);
+console.log(`🔧 Primary IP for backend: 127.0.0.1:8000`);
 console.log(`🔧 Vite will use relative URLs for API calls (network-agnostic)`);
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: './', // Use relative paths for deployment
-  build: {
-    outDir: 'dist',
-    sourcemap: false,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          leaflet: ['leaflet', 'react-leaflet', 'react-leaflet-cluster']
-        }
-      }
-    }
-  },
+  base: '/project/iwatchroad/',
   server: {
-    host: '0.0.0.0', // Allow network access
+    host: '0.0.0.0',
     port: 5173,
     proxy: {
+      // Regular API endpoints (potholes, etc.)
+      '/project/iwatchroad/api': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        secure: false,
+        configure: (proxy, _options) => {
+          proxy.on('error', (err, _req, _res) => {
+            console.log('🚨 API Proxy error:', err);
+          });
+          proxy.on('proxyReq', (_proxyReq, req, _res) => {
+            const reqUrl = req.url || '';
+            console.log(`🔄 Proxying API request: ${req.method} ${reqUrl} -> http://127.0.0.1:8000${reqUrl}`);
+          });
+        }
+      },
+      // Government API endpoints
+      '/project/iwatchroad/gov-api': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        secure: false,
+        configure: (proxy, _options) => {
+          proxy.on('error', (err, _req, _res) => {
+            console.log('🚨 Gov API Proxy error:', err);
+          });
+          proxy.on('proxyReq', (_proxyReq, req, _res) => {
+            const reqUrl = req.url || '';
+            console.log(`🔄 Proxying Gov API request: ${req.method} ${reqUrl} -> http://127.0.0.1:8000${reqUrl}`);
+          });
+        }
+      },
+      // Accounts endpoints with prefix
+      '/project/iwatchroad/accounts': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        secure: false,
+        configure: (proxy, _options) => {
+          proxy.on('error', (err, _req, _res) => {
+            console.log('🚨 Accounts Proxy error:', err);
+          });
+          proxy.on('proxyReq', (_proxyReq, req, _res) => {
+            const reqUrl = req.url || '';
+            console.log(`🔄 Proxying Accounts request: ${req.method} ${reqUrl} -> http://127.0.0.1:8000${reqUrl}`);
+          });
+        }
+      },
+      // Media endpoints with prefix
+      '/project/iwatchroad/media': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        secure: false
+      },
+      // Fallback for direct API calls
       '/api': {
-        target: `http://${primaryIP}:8000`,
+        target: 'http://127.0.0.1:8000',
         changeOrigin: true,
         secure: false,
         configure: (proxy, _options) => {
@@ -56,15 +95,28 @@ export default defineConfig({
             console.log('🚨 Proxy error:', err);
           });
           proxy.on('proxyReq', (_proxyReq, req, _res) => {
-            console.log(`🔄 Proxying API request: ${req.method} ${req.url} -> http://${primaryIP}:8000${req.url}`);
+            console.log(`🔄 Proxying API request: ${req.method} ${req.url} -> http://127.0.0.1:8000${req.url}`);
           });
-        },
+        }
       },
-      '/media': {
-        target: `http://${primaryIP}:8000`,
+      '/accounts': {
+        target: 'http://127.0.0.1:8000',
         changeOrigin: true,
         secure: false,
+        configure: (proxy, _options) => {
+          proxy.on('error', (err, _req, _res) => {
+            console.log('🚨 Proxy error:', err);
+          });
+          proxy.on('proxyReq', (_proxyReq, req, _res) => {
+            console.log(`🔄 Proxying ACCOUNTS request: ${req.method} ${req.url} -> http://127.0.0.1:8000${req.url}`);
+          });
+        }
+      },
+      '/media': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        secure: false
       }
     }
   }
-})
+});

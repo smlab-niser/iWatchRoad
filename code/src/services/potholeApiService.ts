@@ -92,6 +92,11 @@ class PotholeApiService {
         return this.request<Pothole>(API_ENDPOINTS.potholeDetail(id));
     }
 
+    // Get frame image for a specific pothole
+    async getPotholeFrameImage(id: number): Promise<{ id: number, frame_number?: number, frame_image_base64: string }> {
+        return this.request<{ id: number, frame_number?: number, frame_image_base64: string }>(API_ENDPOINTS.potholeFrameImage(id));
+    }
+
     // Create a new pothole report
     async createPothole(data: PotholeCreate): Promise<Pothole> {
         const formData = new FormData();

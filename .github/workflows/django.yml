@@ -1,0 +1,67 @@
+name: CI/CD: Django + React
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: 🧪 Install Backend Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r backend/requirements.txt
+
+    - name: 🧪 Run Django Tests
+      run: |
+        cd backend
+        python manage.py test
+
+    - name: ⚛️ Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: ⚛️ Build React App
+      run: |
+        cd frontend
+        npm install
+        npm run build
+
+    - name: 🚀 Deploy to Server via SSH
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        script: |
+          cd ${{ secrets.PROJECT_PATH }}
+          git pull origin main
+
+          # Rebuild frontend
+          cd frontend
+          npm install
+          npm run build
+
+          # Apply backend updates
+          cd ../backend
+          source venv/bin/activate
+          pip install -r requirements.txt
+          python manage.py migrate
+          python manage.py collectstatic --noinput
+
+          # Restart services
+          sudo systemctl restart myproject
+          sudo systemctl restart nginx

@@ -90,3 +90,96 @@ export interface PotholeInAreaParams {
   lng_center: number;
   radius?: number;
 }
+
+// Government Authorization Types
+export interface GovUser {
+  id: number;
+  username: string;
+  email: string;
+  full_name: string;
+  department?: string;
+  created_at: string;
+}
+
+export interface GovAuthCredentials {
+  username: string;
+  password: string;
+}
+
+export interface GovSignupData {
+  username: string;
+  email: string;
+  password: string;
+  full_name: string;
+  department?: string;
+}
+
+export interface RoadSegment {
+  id?: number;
+  points: [number, number][]; // Array of [lat, lng] coordinates
+  contractor_id: string;
+  contractor_name: string;
+  contractor_email: string;
+  contractor_phone: string;
+  road_creation_date: string;
+  warranty_period: number; // in months
+  money_sanctioned: number;
+  created_by?: {
+    id: number;
+    username: string;
+    email: string;
+    full_name: string;
+    department?: string;
+    created_at: string;
+  };
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface RoadSegmentForm {
+  contractor_id: string;
+  contractor_name: string;
+  contractor_email: string;
+  contractor_phone: string;
+  road_creation_date: string;
+  warranty_period: number;
+  money_sanctioned: number;
+}
+
+// Road Health Types
+export type RoadHealthStatus = 'critical' | 'warning' | 'caution' | 'good';
+
+export interface RoadHealthData {
+  segment_id?: number;
+  pothole_count: number;
+  is_under_warranty: boolean;
+  health_status: RoadHealthStatus;
+  contractor_info?: {
+    contractor_id: string;
+    contractor_name: string;
+    contractor_email: string;
+    contractor_phone: string;
+  };
+  points: [number, number][];
+}
+
+export interface ContractorMessage {
+  id?: number;
+  segment_id: number;
+  contractor_email: string;
+  contractor_phone: string;
+  message: string;
+  message_type: 'auto' | 'manual';
+  sent_at?: string;
+  status?: 'sent' | 'failed' | 'pending';
+  notification_results?: {
+    email: {
+      success: boolean;
+      error?: string;
+    };
+    sms: {
+      success: boolean;
+      error?: string;
+    };
+  };
+}

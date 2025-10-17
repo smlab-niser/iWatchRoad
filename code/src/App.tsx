@@ -8,16 +8,29 @@ import {
   Timeline,
   Footer,
   LoadingSpinner,
-  ErrorDisplay
+  ErrorDisplay,
+  GovLoginModal,
+  GovMapComponent
 } from './components';
 import UploadPage from './components/UploadPage';
-import type { Location, Pothole, PotholeStatus, PotholeSeverity } from './types';
+import type {
+  Location,
+  Pothole,
+  PotholeStatus,
+  PotholeSeverity,
+  GovAuthCredentials,
+  GovSignupData,
+  RoadSegmentForm
+} from './types';
 import { DEFAULT_LOCATION } from './constants';
 import { potholeApiService } from './services/potholeApiService';
+import { govApiService } from './services/govApiService';
 import './App.css';
 
 function App() {
-  const [currentPage, setCurrentPage] = useState<'map' | 'upload'>('map');
+  const [currentPage, setCurrentPage] = useState<'map' | 'upload' | 'gov-auth' | 'road-health'>('map');
+  const [showGovLogin, setShowGovLogin] = useState(false);
+  const [isGovAuthenticated, setIsGovAuthenticated] = useState(false);
   const [currentLocation, setCurrentLocation] = useState<Location>(DEFAULT_LOCATION);
   const [showSatellite, setShowSatellite] = useState(false);
   const [showMajorRoadsOnly, setShowMajorRoadsOnly] = useState(false);
@@ -28,6 +41,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [roadHealthEnabled, setRoadHealthEnabled] = useState(false);
 
   // Load potholes data with optimization
   useEffect(() => {
@@ -80,8 +94,12 @@ function App() {
     setSeverityFilter(severity);
   };
 
-  const handleDateRangeChange = (start: Date, end: Date) => {
-    setDateRange({ start, end });
+  const handleDateRangeChange = (start: Date | null, end: Date | null) => {
+    if (start && end) {
+      setDateRange({ start, end });
+    } else {
+      setDateRange(undefined); // Clear date range to show all potholes
+    }
   };
 
   const handleRetry = () => {
@@ -94,13 +112,76 @@ function App() {
 
   const handleNavigateToMap = () => {
     setCurrentPage('map');
-    // Refresh data when returning to map
-    setRefreshTrigger(prev => prev + 1);
   };
+
+  // Government Authorization Handlers
+  const handleNavigateToGovAuth = () => {
+    setShowGovLogin(true);
+  };
+
+  // Road Health Handler
+  const handleNavigateToRoadHealth = () => {
+    setRoadHealthEnabled(true);
+  };
+
+  const handleRoadHealthFilter = (enabled: boolean) => {
+    setRoadHealthEnabled(enabled);
+  };
+
+  const handleGovLogin = async (credentials: GovAuthCredentials): Promise<void> => {
+    try {
+      await govApiService.login(credentials);
+      setIsGovAuthenticated(true);
+      setShowGovLogin(false);
+      setCurrentPage('gov-auth');
+    } catch (error) {
+      throw error; // Re-throw to be handled by the modal
+    }
+  };
+
+  const handleGovSignup = async (data: GovSignupData): Promise<void> => {
+    try {
+      await govApiService.signup(data);
+      // After successful signup, user should login
+    } catch (error) {
+      throw error; // Re-throw to be handled by the modal
+    }
+  };
+
+  const handleGovLogout = () => {
+    govApiService.logout();
+    setIsGovAuthenticated(false);
+    setCurrentPage('map');
+  };
+
+  const handleRoadSegmentSubmit = async (points: [number, number][], formData: RoadSegmentForm): Promise<void> => {
+    try {
+      await govApiService.createRoadSegment(points, formData);
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  // Check government authentication on app load
+  useEffect(() => {
+    if (govApiService.isAuthenticated()) {
+      setIsGovAuthenticated(true);
+    }
+  }, []);
 
   // Render upload page
   if (currentPage === 'upload') {
     return <UploadPage onNavigateToMap={handleNavigateToMap} />;
+  }
+
+  // Render government authorization map (only if authenticated)
+  if (currentPage === 'gov-auth' && isGovAuthenticated) {
+    return (
+      <GovMapComponent
+        onSubmitSegment={handleRoadSegmentSubmit}
+        onExit={handleGovLogout}
+      />
+    );
   }
 
   return (
@@ -124,6 +205,7 @@ function App() {
             severityFilter={severityFilter}
             dateRange={dateRange}
             refreshTrigger={refreshTrigger}
+            roadHealthEnabled={roadHealthEnabled}
           />
 
           {/* Timeline at bottom of map */}
@@ -143,14 +225,18 @@ function App() {
             onToggleRoads={handleToggleRoads}
             onResetLocation={handleResetLocation}
             onNavigateToUpload={handleNavigateToUpload}
+            onNavigateToGovAuth={handleNavigateToGovAuth}
+            onNavigateToRoadHealth={handleNavigateToRoadHealth}
             currentLocation={currentLocation}
           />
 
           <FilterPanel
             onStatusFilter={handleStatusFilter}
             onSeverityFilter={handleSeverityFilter}
+            onRoadHealthFilter={handleRoadHealthFilter}
             selectedStatus={statusFilter}
             selectedSeverity={severityFilter}
+            roadHealthEnabled={roadHealthEnabled}
           />
 
           <PotholeStatsPanel />
@@ -173,6 +259,14 @@ function App() {
       </main>
 
       <Footer />
+
+      {/* Government Login Modal */}
+      <GovLoginModal
+        isOpen={showGovLogin}
+        onClose={() => setShowGovLogin(false)}
+        onLogin={handleGovLogin}
+        onSignup={handleGovSignup}
+      />
     </div>
   );
 }

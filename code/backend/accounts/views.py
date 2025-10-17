@@ -85,5 +85,5 @@ def admin_dashboard(request):
     """Custom admin dashboard view."""
     return render(request, 'admin/dashboard.html', {
         'user': request.user,
-        'title': 'RoadWatch Admin'
+        'title': 'iWatchRoad Admin'
     })

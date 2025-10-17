@@ -8,4 +8,7 @@ export { Timeline } from './Timeline';
 export { Footer } from './Footer';
 export { LoadingSpinner } from './LoadingSpinner';
 export { ErrorDisplay } from './ErrorDisplay';
+export { GovLoginModal } from './GovLoginModal';
+export { GovMapComponent } from './GovMapComponent';
+export { RoadHealthOverlay } from './RoadHealthOverlay';
 export { default as UploadPage } from './UploadPage';

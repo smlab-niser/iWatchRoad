@@ -2,6 +2,15 @@ from rest_framework import serializers
 from .models import Pothole
 
 
+class PotholeFrameSerializer(serializers.ModelSerializer):
+    """
+    Serializer for frame data only - to avoid loading entire objects with base64 data.
+    """
+    class Meta:
+        model = Pothole
+        fields = ['id', 'frame_number', 'frame_image', 'frame_image_base64']
+
+
 class PotholeSerializer(serializers.ModelSerializer):
     """
     Serializer for Pothole model with full CRUD operations.
@@ -19,7 +28,7 @@ class PotholeSerializer(serializers.ModelSerializer):
             'status',
             'severity',
             'image',
-            'frame_image_base64',
+            'frame_image',  # Use frame_image file instead of base64
             'frame_number',
             'timestamp',
             'created_at',
@@ -33,7 +42,7 @@ class PotholeSerializer(serializers.ModelSerializer):
 
 class PotholeListSerializer(serializers.ModelSerializer):
     """
-    Lightweight serializer for listing potholes (without heavy fields like description).
+    Lightweight serializer for listing potholes (without heavy fields like frame images).
     """
     location_string = serializers.ReadOnlyField()
     
@@ -49,10 +58,11 @@ class PotholeListSerializer(serializers.ModelSerializer):
             'severity',
             'timestamp',
             'image',
-            'frame_image_base64',
-            'frame_number',
+            'frame_image',  # Include frame_image file instead of base64
+            'frame_number',  # Keep frame number for reference
             'road_c_date',
             'contractor',
+            'description',  # Add description back for popup
         ]
 
 
