@@ -269,6 +269,29 @@ To return to the latest version:
 ```bash
 git checkout main
 ```
+## Dataset
+
+The **BharatPotHole** dataset accompanies iWatchRoad and is designed for pothole detection in Indian road environments. The dataset contains **7,000+ annotated frames** collected from forward-facing dashcam footage under diverse lighting, weather, and road conditions, providing realistic scenarios for training and evaluating pothole detection systems.
+**Kaggle Link:** https://www.kaggle.com/datasets/surbhisaswatimohanty/bharatpothole 
+
+If you use the dataset in your research, please cite the accompanying iWatchRoad paper.
+## Citation 
+If you use **iWatchRoad** in your research, please cite our paper:
+```bibtex
+@inproceedings{10.1145/3799830.3799873,
+author = {Sahoo, Rishi Raj and Mohanty, Surbhi Saswati and Mishra, Subhankar},
+title = {iWatchRoad: Scalable Detection and Geospatial Visualization of Potholes for Smart Cities},
+year = {2026},
+isbn = {9798400723551},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA}, doi = {10.1145/3799830.3799873},
+url = {https://doi.org/10.1145/3799830.3799873},
+booktitle = {Proceedings of the 13th ACM IKDD International Conference on Data Science (CODS '25')},
+pages = {262--270},
+numpages = {9},
+keywords = { Pothole detection, YOLO, GPS tagging, OpenStreetMap, Computer vision, Road maintenance, Real-time detection, Indian roads },
+series = {CODS '25'} }
+```
 
 ## Contributing
 1. Fork the repository
@@ -288,6 +311,5 @@ This work is licensed under a
 [cc-by-nc-sa-shield]: https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg
 
 See the [LICENSE](LICENSE) file for details.
-
 ## Support
 For questions and support, please open an issue on GitHub or contact the development team.
