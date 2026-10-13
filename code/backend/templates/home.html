@@ -91,7 +91,7 @@
 
                     {% if user.is_staff %}
                     <p class="lead mb-4">You have admin access. You can manage pothole reports and system data.</p>
-                    <a href="/admin/" class="btn-custom">
+                    <a href="{{ PRE_URL }}admin/" class="btn-custom">
                         <i class="fas fa-tachometer-alt me-2"></i>Access Admin Dashboard
                     </a>
                     {% else %}
@@ -102,7 +102,7 @@
                     {% endif %}
 
                     <div class="mt-4">
-                        <a href="/accounts/logout/" class="btn-outline-custom">
+                        <a href="{{ PRE_URL }}accounts/logout/" class="btn-outline-custom">
                             <i class="fas fa-sign-out-alt me-2"></i>Logout
                         </a>
                     </div>
@@ -121,10 +121,10 @@
                     </div>
 
                     <div class="action-buttons">
-                        <a href="/accounts/register/" class="btn-custom">
+                        <a href="{{ PRE_URL }}accounts/register/" class="btn-custom">
                             <i class="fas fa-user-plus me-2"></i>Register for Admin Access
                         </a>
-                        <a href="/accounts/login/" class="btn-outline-custom">
+                        <a href="{{ PRE_URL }}accounts/login/" class="btn-outline-custom">
                             <i class="fas fa-sign-in-alt me-2"></i>Login
                         </a>
                     </div>
@@ -136,8 +136,8 @@
         <div class="row justify-content-center mt-4">
             <div class="col-md-8 col-lg-6">
                 <div class="text-center text-white">
-                    <p><a href="/project/iwatchroad/" class="text-white">View Frontend Application</a> | <a
-                            href="/api/potholes/" class="text-white">API Documentation</a></p>
+                    <p><a href="{{ PRE_URL }}" class="text-white">View Frontend Application</a> | <a
+                            href="{{ PRE_URL }}api/potholes/" class="text-white">API Documentation</a></p>
                 </div>
             </div>
         </div>

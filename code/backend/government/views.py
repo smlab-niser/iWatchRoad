@@ -55,15 +55,12 @@ def gov_login(request):
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])  # Allow logout without authentication
 def gov_logout(request):
     """Government user logout endpoint"""
-    try:
-        # Delete the token
-        request.user.auth_token.delete()
-        return Response({'message': 'Successfully logged out'}, status=status.HTTP_200_OK)
-    except:
-        return Response({'message': 'Logged out'}, status=status.HTTP_200_OK)
+    # Since we're using stateless tokens, just return success
+    # The frontend will clear the token from local storage
+    return Response({'message': 'Successfully logged out'}, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])

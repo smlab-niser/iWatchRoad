@@ -1,3 +1,4 @@
+from potholes.frame_storage import save_frame_base64
 from django.core.management.base import BaseCommand
 import csv
 import json
@@ -13,6 +14,14 @@ class Command(BaseCommand):
         parser.add_argument('--csv-path', type=str, default='pothole_gps_final.csv', help='Path to the CSV file')
         parser.add_argument('--limit', type=int, default=600, help='Maximum number of rows to import')
         parser.add_argument('--clear', action='store_true', help='Clear existing data before import')
+
+    @staticmethod
+    def _write_pending_frames(potholes):
+        """Persist frames as JPEG files once bulk_create has assigned pks."""
+        for p in potholes:
+            b64 = getattr(p, '_pending_frame_b64', None)
+            if b64 and p.pk:
+                save_frame_base64(p, b64, p.frame_number)
 
     def handle(self, *args, **options):
         csv_path = options['csv_path']
@@ -141,26 +150,31 @@ class Command(BaseCommand):
                             timestamp=timestamp,
                             road_c_date=road_c_date,
                             contractor=contractor,
-                            frame_image_base64=frame_image_base64,
                             frame_number=frame_number
                         )
-                        
+
+                        # Frames are written as JPEG files after the bulk insert
+                        # (the object needs a pk before it can own a file).
+                        pothole._pending_frame_b64 = frame_image_base64
+
                         potholes_to_create.append(pothole)
                         imported += 1
                         
                         # Batch create every 50 records
                         if len(potholes_to_create) >= 50:
                             Pothole.objects.bulk_create(potholes_to_create, ignore_conflicts=True)
+                            self._write_pending_frames(potholes_to_create)
                             self.stdout.write(f"Created {len(potholes_to_create)} records... (Total: {imported})")
                             potholes_to_create = []
-                            
+
                     except Exception as e:
                         self.stdout.write(f"Error processing row {processed}: {str(e)}")
                         continue
-                
+
                 # Create remaining records
                 if potholes_to_create:
                     Pothole.objects.bulk_create(potholes_to_create, ignore_conflicts=True)
+                    self._write_pending_frames(potholes_to_create)
                     self.stdout.write(f"Created final batch of {len(potholes_to_create)} records")
                 
                 # Final statistics

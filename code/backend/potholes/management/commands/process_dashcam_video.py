@@ -4,6 +4,7 @@ Django management command to process dashcam videos and sync to database
 import os
 import csv
 import tempfile
+from potholes.frame_storage import save_frame_base64
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from potholes.models import Pothole
@@ -111,7 +112,9 @@ class Command(BaseCommand):
                         existing_pothole.severity = severity
                         existing_pothole.frame_number = frame_number
                         if frame_data:
-                            existing_pothole.frame_image_base64 = frame_data
+                            save_frame_base64(
+                                existing_pothole, frame_data, frame_number, save=False,
+                            )
                         existing_pothole.save()
                         updated_count += 1
                     else:
@@ -127,10 +130,10 @@ class Command(BaseCommand):
                             description=f"Detected by dashcam processing - Grade: {grade}"
                         )
                         
-                        if frame_data:
-                            pothole.frame_image_base64 = frame_data
-                            
                         pothole.save()
+                        if frame_data:
+                            save_frame_base64(pothole, frame_data, frame_number)
+
                         created_count += 1
                         
                 except Exception as e:

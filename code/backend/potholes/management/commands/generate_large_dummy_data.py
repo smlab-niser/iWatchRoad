@@ -1,5 +1,6 @@
 import random
 from datetime import datetime, date, timedelta
+from potholes.frame_storage import save_frame_base64
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from potholes.models import Pothole
@@ -243,7 +244,6 @@ class Command(BaseCommand):
                 description=description,
                 contractor=contractor,
                 road_c_date=road_c_date,
-                frame_image_base64=frame_data,
                 frame_number=frame_number
             )
             

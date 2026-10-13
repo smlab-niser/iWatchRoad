@@ -6,6 +6,18 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from .serializers import (
+    CustomTokenObtainPairSerializer,
+    UserRegisterSerializer,
+    UserSerializer,
+    get_legacy_role,
+)
 import re
 
 
@@ -87,3 +99,153 @@ def admin_dashboard(request):
         'user': request.user,
         'title': 'iWatchRoad Admin'
     })
+
+
+# ---------------------------------------------------------------------------
+# Mobile (JWT) API views
+#
+# Ported from iwatchroad/backend as an ADDITIVE change -- see
+# Plan/BACKEND_PROGRESS.md. These views build the {success, message, data}
+# envelope themselves, so they do NOT require a custom DRF renderer. The
+# project-wide JSONRenderer stays as-is and the React SPA is unaffected.
+# ---------------------------------------------------------------------------
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    """JWT login returning tokens, the user object, and a legacy role."""
+    serializer_class = CustomTokenObtainPairSerializer
+
+    def post(self, request, *args, **kwargs):
+        try:
+            response = super().post(request, *args, **kwargs)
+            return Response({
+                'success': True,
+                'message': 'Login successful',
+                'data': response.data
+            }, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({
+                'success': False,
+                'message': str(e)
+            }, status=status.HTTP_401_UNAUTHORIZED)
+
+
+class CitizenRegistrationView(APIView):
+    """Register a citizen user without staff elevation."""
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = UserRegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response({
+                'success': True,
+                'message': 'Citizen account created successfully.',
+                'data': {
+                    'user': UserSerializer(user).data
+                }
+            }, status=status.HTTP_201_CREATED)
+        return Response({
+            'success': False,
+            'message': 'Registration failed',
+            'errors': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserProfileView(APIView):
+    """Return the authenticated user's profile and role."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response({
+            'success': True,
+            'data': {
+                'user': serializer.data,
+                'role': get_legacy_role(request.user)
+            }
+        }, status=status.HTTP_200_OK)
+
+
+class FirebaseLoginView(APIView):
+    """
+    Exchange a Firebase ID token for a Django JWT (Google sign-in).
+
+    firebase_admin is imported lazily and the app is initialised on first use:
+    serviceAccountKey.json is not present in this deployment, so an eager
+    import would break every other view in this module. Without the key this
+    endpoint returns 503 and the rest of the auth API keeps working.
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        id_token = (
+            request.data.get('id_token')
+            or request.data.get('idToken')
+            or request.data.get('token')
+        )
+        if not id_token:
+            return Response(
+                {'success': False, 'message': 'No token provided'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            import firebase_admin
+            from firebase_admin import auth as firebase_auth, credentials
+        except ImportError:
+            return Response(
+                {'success': False,
+                 'message': 'Google sign-in is not configured on this server.'},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+
+        if not firebase_admin._apps:
+            from django.conf import settings as django_settings
+            import os
+            cred_path = os.path.join(django_settings.BASE_DIR, 'serviceAccountKey.json')
+            if not os.path.exists(cred_path):
+                return Response(
+                    {'success': False,
+                     'message': 'Google sign-in is not configured on this server.'},
+                    status=status.HTTP_503_SERVICE_UNAVAILABLE,
+                )
+            firebase_admin.initialize_app(credentials.Certificate(cred_path))
+
+        try:
+            decoded_token = firebase_auth.verify_id_token(id_token)
+            email = decoded_token.get('email')
+            name = decoded_token.get('name', '')
+
+            if not email:
+                return Response(
+                    {'success': False, 'message': 'No email found in token'},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            user, created = User.objects.get_or_create(
+                username=email,
+                defaults={'email': email, 'first_name': name},
+            )
+            if created:
+                user.set_unusable_password()
+                user.save()
+
+            refresh = RefreshToken.for_user(user)
+
+            return Response({
+                'success': True,
+                'message': 'Login successful',
+                'data': {
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token),
+                    'user': UserSerializer(user).data,
+                    'role': get_legacy_role(user),
+                }
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response(
+                {'success': False, 'message': str(e)},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )

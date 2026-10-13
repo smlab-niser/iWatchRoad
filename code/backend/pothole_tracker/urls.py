@@ -18,6 +18,13 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
+from accounts.views import (
+    CustomTokenObtainPairView,
+    CitizenRegistrationView,
+    UserProfileView,
+    FirebaseLoginView,
+)
 
 PRE_URL = settings.PRE_URL
 admin.site.site_url = "/" + settings.PRE_URL
@@ -26,6 +33,15 @@ urlpatterns = [
     path(PRE_URL + 'admin/', admin.site.urls),
     path(PRE_URL + 'accounts/', include('accounts.urls')),
     path(PRE_URL + 'gov-api/', include('government.urls')),
+
+    # Mobile API v1 -- JWT authentication (additive; see Plan/BACKEND_PROGRESS.md)
+    path(PRE_URL + 'api/v1/auth/login/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path(PRE_URL + 'api/v1/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path(PRE_URL + 'api/v1/auth/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+    path(PRE_URL + 'api/v1/auth/register/', CitizenRegistrationView.as_view(), name='api_register'),
+    path(PRE_URL + 'api/v1/auth/profile/', UserProfileView.as_view(), name='api_profile'),
+    path(PRE_URL + 'api/v1/auth/firebase-login/', FirebaseLoginView.as_view(), name='firebase_login'),
+
     path(PRE_URL + '', include('potholes.urls')),
 ]
 

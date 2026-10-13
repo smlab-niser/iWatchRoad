@@ -1,5 +1,6 @@
 import csv
 import os
+from potholes.frame_storage import save_frame_base64
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from potholes.models import Pothole
@@ -72,17 +73,18 @@ class Command(BaseCommand):
                         pothole = Pothole.objects.filter(frame_number=frame_number).first()
                         
                         if pothole:
-                            # Check if current image is truncated (exactly 500000 chars)
-                            if pothole.frame_image_base64 and len(pothole.frame_image_base64) == 500000:
-                                # Update with full image data (no truncation)
-                                pothole.frame_image_base64 = frame_image_base64
-                                pothole.save()
+                            # Re-import the full-resolution frame as a JPEG file,
+                            # replacing whatever (possibly truncated) frame is there.
+                            stored = save_frame_base64(
+                                pothole, frame_image_base64, frame_number,
+                            )
+                            if stored:
                                 updated_count += 1
-                                
+
                                 if updated_count % 10 == 0:
                                     self.stdout.write(f'Updated {updated_count} frame images...')
-                                    
-                                self.stdout.write(f'Row {row_num}: Updated frame {frame_number} - Size: {len(frame_image_base64)} chars')
+
+                                self.stdout.write(f'Row {row_num}: Updated frame {frame_number} -> {stored}')
                             else:
                                 skipped_count += 1
                         else:

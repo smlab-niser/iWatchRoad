@@ -82,7 +82,7 @@ iWatchRoadv2 is an intelligent road infrastructure monitoring system that combin
 
 ### Prerequisites
 - Python 3.11+
-- Node.js 18+
+- Node.js 20.19+ or 22.12+
 - Git
 
 ### 1. Clone the Repository

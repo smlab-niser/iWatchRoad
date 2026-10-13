@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { API_BASE_URL } from '../config';
 import './UploadPage.css';
 
 interface UploadPageProps {
@@ -39,7 +40,7 @@ const UploadPage: React.FC<UploadPageProps> = ({ onNavigateToMap }) => {
   };
 
   const processVideo = async (videoPath: string, gpsDirectory: string) => {
-    const response = await fetch('/api/process-video/', {
+    const response = await fetch(`${API_BASE_URL}/process-video/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -72,11 +73,11 @@ const UploadPage: React.FC<UploadPageProps> = ({ onNavigateToMap }) => {
     try {
       // Upload video files
       setProcessingStatus('Uploading video files...');
-      const videoUploadResult = await uploadFiles(videoFiles, '/api/upload-videos/');
+      const videoUploadResult = await uploadFiles(videoFiles, `${API_BASE_URL}/upload-videos/`);
 
       // Upload GPS files
       setProcessingStatus('Uploading GPS files...');
-      const gpsUploadResult = await uploadFiles(gpsFiles, '/api/upload-gps/');
+      const gpsUploadResult = await uploadFiles(gpsFiles, `${API_BASE_URL}/upload-gps/`);
 
       // Process each video with corresponding GPS data
       const videoResults = [];

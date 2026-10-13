@@ -16,11 +16,18 @@ export const MAP_CONFIG = {
   animationDuration: 1000
 };
 
-// OpenStreetMap tile URLs
+// Basemap tile URLs (all key-free; CARTO basemaps now require an API key)
 export const TILE_LAYERS = {
-  standard: 'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png',
+  standard: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
   satellite: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
   roads: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+};
+
+// Highest zoom each basemap actually serves tiles for; Leaflet upscales beyond it
+export const TILE_MAX_NATIVE_ZOOM = {
+  standard: 16,
+  satellite: 18,
+  roads: 19
 };
 
 // Nominatim API base URL for location search

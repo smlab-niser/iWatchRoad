@@ -4,6 +4,7 @@ import base64
 from io import BytesIO
 from PIL import Image
 from datetime import datetime
+from potholes.frame_storage import save_frame_base64
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from potholes.models import Pothole
@@ -192,14 +193,17 @@ class Command(BaseCommand):
                             # Update frame data if available and not already set
                             if frame_number and not existing.frame_number:
                                 existing.frame_number = frame_number
-                            if frame_image_base64 and not existing.frame_image_base64:
-                                existing.frame_image_base64 = frame_image_base64
-                            
+                            if frame_image_base64 and not existing.frame_image:
+                                save_frame_base64(
+                                    existing, frame_image_base64,
+                                    existing.frame_number, save=False,
+                                )
+
                             existing.save()
                             skipped_count += 1
                         else:
                             # Create new pothole entry
-                            Pothole.objects.create(
+                            new_pothole = Pothole.objects.create(
                                 timestamp=timestamp,
                                 latitude=str(latitude),
                                 longitude=str(longitude),
@@ -208,8 +212,13 @@ class Command(BaseCommand):
                                 status='reported',
                                 description=f"GPS detected pothole. Grade: {pothole_grade}",
                                 frame_number=frame_number,
-                                frame_image_base64=frame_image_base64
                             )
+                            # Legacy CSVs carry base64 blobs; decode once here so
+                            # only a JPEG file is persisted.
+                            if frame_image_base64:
+                                save_frame_base64(
+                                    new_pothole, frame_image_base64, frame_number,
+                                )
                             imported_count += 1
                             
                             if imported_count % 5 == 0:

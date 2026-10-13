@@ -4,11 +4,11 @@ from .models import Pothole
 
 class PotholeFrameSerializer(serializers.ModelSerializer):
     """
-    Serializer for frame data only - to avoid loading entire objects with base64 data.
+    Serializer for frame data only - keeps the payload to the frame reference.
     """
     class Meta:
         model = Pothole
-        fields = ['id', 'frame_number', 'frame_image', 'frame_image_base64']
+        fields = ['id', 'frame_number', 'frame_image']
 
 
 class PotholeSerializer(serializers.ModelSerializer):

@@ -1,6 +1,8 @@
+import { API_BASE_URL } from '../config';
+
 // API configuration and base URL
 export const API_CONFIG = {
-    baseURL: '/project/iwatchroad/api', // Use full path with PRE_URL
+    baseURL: API_BASE_URL, // Uses PRE_URL from config
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json',

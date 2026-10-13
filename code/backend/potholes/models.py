@@ -48,21 +48,21 @@ class Pothole(models.Model):
         help_text="Image of the pothole"
     )
     
-    # Frame image file (preferred storage method)
+    # Frame image file -- the ONLY supported storage method.
+    #
+    # Evidence frames are uploaded as JPEG files (multipart/form-data) and
+    # stored on disk; the database holds just the relative path. The former
+    # `frame_image_base64` TextField was removed: base64 inflates payloads by
+    # ~33%, cannot be streamed, forces the whole image through the DB row, and
+    # made the 2.1 GB db.sqlite3 the bottleneck it is today. See
+    # Plan/EVIDENCE_STORAGE.md.
     frame_image = models.ImageField(
-        upload_to='pothole_frames/',
+        upload_to='pothole_frames/%Y/%m/%d/',
         blank=True,
         null=True,
-        help_text="Frame image file"
+        help_text="Evidence frame (JPEG file on disk; DB stores the path only)"
     )
-    
-    # Base64 encoded image from CSV frames (deprecated, for backward compatibility)
-    frame_image_base64 = models.TextField(
-        blank=True,
-        null=True,
-        help_text="Base64 encoded image data from CSV frame (deprecated)"
-    )
-    
+
     # Frame number for reference
     frame_number = models.PositiveIntegerField(
         blank=True,

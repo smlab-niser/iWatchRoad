@@ -4,7 +4,7 @@ import { Map as LeafletMap } from 'leaflet';
 import type { LatLngTuple } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { Location, PotholeStatus, PotholeSeverity } from '../types';
-import { MAP_CONFIG, TILE_LAYERS } from '../constants';
+import { MAP_CONFIG, TILE_LAYERS, TILE_MAX_NATIVE_ZOOM } from '../constants';
 import { PotholeMarkers } from './PotholeMarkers';
 import { RoadHealthOverlay } from './RoadHealthOverlay';
 
@@ -62,10 +62,13 @@ export const MapComponent: React.FC<MapComponentProps> = ({
   };
 
   const getTileAttribution = () => {
-    if (showSatellite) {
-      return '&copy; <a href="https://www.esri.com/">Esri</a>';
-    }
-    return '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
+    return '&copy; <a href="https://www.esri.com/">Esri</a>';
+  };
+
+  const getTileMaxNativeZoom = () => {
+    return showSatellite
+      ? TILE_MAX_NATIVE_ZOOM.satellite
+      : TILE_MAX_NATIVE_ZOOM.standard;
   };
 
   const center: LatLngTuple = [location.lat, location.lng];
@@ -93,9 +96,11 @@ export const MapComponent: React.FC<MapComponentProps> = ({
         scrollWheelZoom={true}
       >
         <TileLayer
+          key={showSatellite ? 'satellite' : 'standard'}
           url={getTileUrl()}
           attribution={getTileAttribution()}
           maxZoom={MAP_CONFIG.maxZoom}
+          maxNativeZoom={getTileMaxNativeZoom()}
           minZoom={MAP_CONFIG.minZoom}
         />
 

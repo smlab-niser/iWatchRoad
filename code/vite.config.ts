@@ -2,6 +2,9 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import { networkInterfaces } from 'os'
 
+// PRE_URL - should match backend .env
+const PRE_URL = '/project/iwatchroad'
+
 // Get the actual network IP address
 const getNetworkIP = () => {
   const nets = networkInterfaces();
@@ -29,13 +32,13 @@ console.log(`🔧 Vite will use relative URLs for API calls (network-agnostic)`)
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: '/project/iwatchroad/',
+  base: `${PRE_URL}/`,
   server: {
     host: '0.0.0.0',
     port: 5173,
     proxy: {
       // Regular API endpoints (potholes, etc.)
-      '/project/iwatchroad/api': {
+      [`${PRE_URL}/api`]: {
         target: 'http://127.0.0.1:8000',
         changeOrigin: true,
         secure: false,
@@ -50,7 +53,7 @@ export default defineConfig({
         }
       },
       // Government API endpoints
-      '/project/iwatchroad/gov-api': {
+      [`${PRE_URL}/gov-api`]: {
         target: 'http://127.0.0.1:8000',
         changeOrigin: true,
         secure: false,
@@ -65,7 +68,7 @@ export default defineConfig({
         }
       },
       // Accounts endpoints with prefix
-      '/project/iwatchroad/accounts': {
+      [`${PRE_URL}/accounts`]: {
         target: 'http://127.0.0.1:8000',
         changeOrigin: true,
         secure: false,
@@ -80,7 +83,7 @@ export default defineConfig({
         }
       },
       // Media endpoints with prefix
-      '/project/iwatchroad/media': {
+      [`${PRE_URL}/media`]: {
         target: 'http://127.0.0.1:8000',
         changeOrigin: true,
         secure: false

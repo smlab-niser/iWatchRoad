@@ -5,10 +5,11 @@ import type {
     RoadSegment,
     RoadSegmentForm
 } from '../types';
+import { GOV_API_BASE_URL } from '../config';
 
 // Government API configuration - using separate database
 const GOV_API_CONFIG = {
-    baseURL: '/project/iwatchroad/gov-api', // Separate API for government features
+    baseURL: GOV_API_BASE_URL, // Uses PRE_URL from config
     headers: {
         'Content-Type': 'application/json',
     },
@@ -18,9 +19,14 @@ class GovApiService {
     private static instance: GovApiService;
     private baseURL: string;
     private authToken: string | null = null;
+    private refreshToken: string | null = null;
+    private readonly authTokenKey = 'gov_auth_token';
+    private readonly refreshTokenKey = 'gov_refresh_token';
+    private readonly userKey = 'gov_user';
 
     constructor() {
         this.baseURL = GOV_API_CONFIG.baseURL;
+        this.hydrateAuthFromStorage();
     }
 
     static getInstance(): GovApiService {
@@ -30,10 +36,28 @@ class GovApiService {
         return GovApiService.instance;
     }
 
+    private hydrateAuthFromStorage(): void {
+        if (!this.authToken) {
+            this.authToken = localStorage.getItem(this.authTokenKey);
+        }
+        if (!this.refreshToken) {
+            this.refreshToken = localStorage.getItem(this.refreshTokenKey);
+        }
+    }
+
+    private persistAuthSession(accessToken: string, refreshToken: string, user: GovUser): void {
+        this.authToken = accessToken;
+        this.refreshToken = refreshToken;
+        localStorage.setItem(this.authTokenKey, accessToken);
+        localStorage.setItem(this.refreshTokenKey, refreshToken);
+        localStorage.setItem(this.userKey, JSON.stringify(user));
+    }
+
     private async request<T>(
         endpoint: string,
         options: RequestInit = {}
     ): Promise<T> {
+        this.hydrateAuthFromStorage();
         const url = `${this.baseURL}${endpoint}`;
 
         const config: RequestInit = {
@@ -76,24 +100,25 @@ class GovApiService {
     }
 
     // Authentication methods
-    async login(credentials: GovAuthCredentials): Promise<{ user: GovUser; token: string }> {
-        const response = await this.request<{ user: GovUser; token: string }>('/auth/login/', {
+    async login(credentials: GovAuthCredentials): Promise<{ user: GovUser; access: string; refresh: string }> {
+        const response = await this.request<{ data: { user: GovUser; access: string; refresh: string } }>('/auth/login/', {
             method: 'POST',
             body: JSON.stringify(credentials),
         });
 
-        this.authToken = response.token;
-        localStorage.setItem('gov_auth_token', response.token);
-        localStorage.setItem('gov_user', JSON.stringify(response.user));
+        const authData = response.data;
+        this.persistAuthSession(authData.access, authData.refresh, authData.user);
 
-        return response;
+        return authData;
     }
 
     async signup(data: GovSignupData): Promise<{ user: GovUser; message: string }> {
-        return this.request<{ user: GovUser; message: string }>('/auth/signup/', {
+        const response = await this.request<{ data: { user: GovUser; message: string } }>('/auth/signup/', {
             method: 'POST',
             body: JSON.stringify(data),
         });
+
+        return response.data;
     }
 
     async logout(): Promise<void> {
@@ -105,24 +130,22 @@ class GovApiService {
             console.error('Logout error:', error);
         } finally {
             this.authToken = null;
-            localStorage.removeItem('gov_auth_token');
-            localStorage.removeItem('gov_user');
+            this.refreshToken = null;
+            localStorage.removeItem(this.authTokenKey);
+            localStorage.removeItem(this.refreshTokenKey);
+            localStorage.removeItem(this.userKey);
         }
     }
 
     // Check if user is authenticated
     isAuthenticated(): boolean {
-        const token = localStorage.getItem('gov_auth_token');
-        if (token) {
-            this.authToken = token;
-            return true;
-        }
-        return false;
+        this.hydrateAuthFromStorage();
+        return Boolean(this.authToken);
     }
 
     // Get current user from localStorage
     getCurrentUser(): GovUser | null {
-        const userStr = localStorage.getItem('gov_user');
+        const userStr = localStorage.getItem(this.userKey);
         return userStr ? JSON.parse(userStr) : null;
     }
 
@@ -164,6 +187,7 @@ class GovApiService {
 
     // Verify token validity
     async verifyToken(): Promise<boolean> {
+        this.hydrateAuthFromStorage();
         if (!this.authToken) return false;
 
         try {

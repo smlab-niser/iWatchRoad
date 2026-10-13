@@ -21,6 +21,13 @@ class PotholePagination(PageNumberPagination):
     max_page_size = 100
 
 
+class MapPinPagination(PageNumberPagination):
+    """Ultra-lightweight pagination for the map pin endpoint."""
+    page_size = 2000
+    page_size_query_param = 'page_size'
+    max_page_size = 5000
+
+
 class PotholeViewSet(viewsets.ModelViewSet):
     """
     ViewSet for managing pothole reports with full CRUD operations.
@@ -36,7 +43,7 @@ class PotholeViewSet(viewsets.ModelViewSet):
     """
     
     # Memory optimization: defer base64 field by default
-    queryset = Pothole.objects.defer('frame_image_base64').select_related()
+    queryset = Pothole.objects.select_related()
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['status', 'severity', 'num_potholes']
     search_fields = ['description']
@@ -126,7 +133,31 @@ class PotholeViewSet(viewsets.ModelViewSet):
         
         serializer = PotholeListSerializer(queryset, many=True)
         return Response(serializer.data)
-    
+
+    @action(detail=False, methods=['get'])
+    def map_pins(self, request):
+        """
+        Ultra-lightweight endpoint for map rendering (mobile app).
+        Returns only id, latitude, longitude, severity -- nothing else.
+        Paginated at 2000 records per page to minimise round-trips.
+        """
+        queryset = self.get_queryset().only('id', 'latitude', 'longitude', 'severity')
+        paginator = MapPinPagination()
+        page = paginator.paginate_queryset(queryset, request)
+        records = page if page is not None else queryset
+        data = [
+            {
+                'id': p.id,
+                'latitude': str(p.latitude),
+                'longitude': str(p.longitude),
+                'severity': p.severity,
+            }
+            for p in records
+        ]
+        if page is not None:
+            return paginator.get_paginated_response(data)
+        return Response(data)
+
     @action(detail=False, methods=['get'])
     def stats(self, request):
         """
@@ -157,30 +188,26 @@ class PotholeViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['get'])
     def frame_image(self, request, pk=None):
         """
-        Get the frame image for a specific pothole.
-        Returns frame_image file URL or base64 data if file not available.
+        Get the frame image reference for a specific pothole.
+
+        Returns a URL to the JPEG on disk. The image bytes are served by nginx
+        from MEDIA_ROOT, never through Django and never inlined in JSON.
         """
         try:
             # Get only the required fields to minimize memory usage
-            pothole = Pothole.objects.only('id', 'frame_number', 'frame_image', 'frame_image_base64').get(pk=pk)
-            
-            response_data = {
-                'id': pothole.id,
-                'frame_number': pothole.frame_number,
-            }
-            
-            # Prefer frame_image file over base64
-            if pothole.frame_image:
-                response_data['frame_image_url'] = request.build_absolute_uri(pothole.frame_image.url)
-            elif pothole.frame_image_base64:
-                response_data['frame_image_base64'] = pothole.frame_image_base64
-            else:
+            pothole = Pothole.objects.only('id', 'frame_number', 'frame_image').get(pk=pk)
+
+            if not pothole.frame_image:
                 return Response(
-                    {'error': 'No frame image available for this pothole'}, 
+                    {'error': 'No frame image available for this pothole'},
                     status=status.HTTP_404_NOT_FOUND
                 )
-            
-            return Response(response_data)
+
+            return Response({
+                'id': pothole.id,
+                'frame_number': pothole.frame_number,
+                'frame_image_url': request.build_absolute_uri(pothole.frame_image.url),
+            })
         except Pothole.DoesNotExist:
             return Response(
                 {'error': 'Pothole not found'}, 

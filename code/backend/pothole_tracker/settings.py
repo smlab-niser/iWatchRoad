@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
 import os
 from dotenv import load_dotenv
 
@@ -39,7 +40,7 @@ STATICFILES_DIRS = [
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 import socket
 
@@ -89,6 +90,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
     'django_filters',
     'potholes',
@@ -119,6 +122,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'pothole_tracker.context_processors.pre_url',
             ],
         },
     },
@@ -188,11 +192,48 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # REST Framework Configuration
+#
+# NOTE: DEFAULT_RENDERER_CLASSES and DEFAULT_PERMISSION_CLASSES are deliberately
+# left as-is. The mobile app's JWT views build their own {success, message,
+# data} envelope internally, so no custom renderer is needed -- and adding one
+# would wrap every response and break the React SPA, which reads bare arrays.
+# See Plan/BACKEND_PROGRESS.md.
 REST_FRAMEWORK = {
+    # JWT for the mobile app; session/basic auth still available for the admin
+    # and any browser-driven DRF flows.
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
+        # Allow read-only access for unauthenticated users, require auth for write operations
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
+    # Disable the browsable API - only return JSON responses
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
     ],
 }
+
+# SimpleJWT Configuration (mobile app authentication)
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+}
+
+# Allow login with either username or email (mobile app); the stock backend
+# stays second so nothing that worked before stops working.
+AUTHENTICATION_BACKENDS = [
+    'accounts.backends.EmailOrUsernameModelBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
 
 # CORS settings for frontend integration - Allow all origins for development
 CORS_ALLOW_ALL_ORIGINS = True  # For development only - restrict for production
@@ -214,7 +255,13 @@ for ip in network_ips:
 CORS_ALLOW_CREDENTIALS = True
 
 # Media files (for pothole images)
-MEDIA_URL = '/media/'
+#
+# MUST carry the PRE_URL prefix, exactly like STATIC_URL above. nginx serves
+# uploads from `location /project/iwatchroad/media/`, so a bare '/media/' makes
+# every image URL the API emits a 404 -- `.../media/pothole_frames/x.jpg`
+# returns 404 while `.../project/iwatchroad/media/pothole_frames/x.jpg`
+# returns 200. This broke pothole images for the website and the app alike.
+MEDIA_URL = f"/{PRE_URL.strip('/')}/media/" if PRE_URL.strip("/") else "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # File upload settings

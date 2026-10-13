@@ -1,6 +1,7 @@
 import csv
 import random
 from datetime import datetime, date, timedelta
+from potholes.frame_storage import save_frame_base64
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from potholes.models import Pothole
@@ -151,13 +152,14 @@ class Command(BaseCommand):
                             status='reported',  # Default status
                             timestamp=timestamp,
                             severity=severity,
-                            frame_image_base64=frame_data if frame_data else None,
                             frame_number=frame_number,
                             description=f"Pothole detected from video analysis. Grade: {grade}",
                             road_c_date=road_c_date,
                             contractor=contractor
                         )
-                        
+                        if frame_data:
+                            save_frame_base64(pothole, frame_data, frame_number)
+
                         imported_count += 1
                         
                         if imported_count % 100 == 0:

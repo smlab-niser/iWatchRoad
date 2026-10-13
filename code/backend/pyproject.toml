@@ -1,8 +1,7 @@
 [project]
 name = "backend"
 version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
+description = "iWatchRoadv2 - Road Infrastructure Monitoring System"
 requires-python = ">=3.11"
 dependencies = [
     "django>=5.2.4",
@@ -24,4 +23,9 @@ dependencies = [
     "torch>=2.0.0",
     "torchvision>=0.15.0",
     "cvzone>=1.6.1",
+    "python-dotenv>=1.2.2",
 ]
+
+[tool.setuptools]
+py-modules = []
+packages = ["pothole_tracker", "potholes", "accounts", "government", "dashcam_processor"]

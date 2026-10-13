@@ -110,7 +110,7 @@ export const PotholeMarkers: React.FC<PotholeMarkersProps> = ({
     const [potholes, setPotholes] = useState<Pothole[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [frameImages, setFrameImages] = useState<Record<number, { frame_number?: number, frame_image_base64: string }>>({});
+    const [frameImages, setFrameImages] = useState<Record<number, { frame_number?: number, frame_image_base64?: string, frame_image_url?: string }>>({});
     const [loadingFrames, setLoadingFrames] = useState<Set<number>>(new Set());
 
     // Road segment related state
@@ -194,7 +194,8 @@ export const PotholeMarkers: React.FC<PotholeMarkersProps> = ({
                 ...prev,
                 [potholeId]: {
                     frame_number: frameData.frame_number,
-                    frame_image_base64: frameData.frame_image_base64
+                    frame_image_base64: frameData.frame_image_base64,
+                    frame_image_url: frameData.frame_image_url
                 }
             }));
         } catch (err) {
@@ -246,6 +247,11 @@ export const PotholeMarkers: React.FC<PotholeMarkersProps> = ({
 
     const getStatusLabel = (status: PotholeStatus) => {
         return status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+    };
+
+    const getFrameImageSrc = (frameImage?: { frame_number?: number, frame_image_base64?: string, frame_image_url?: string }) => {
+        if (!frameImage) return '';
+        return frameImage.frame_image_url || (frameImage.frame_image_base64 ? `data:image/jpeg;base64,${frameImage.frame_image_base64}` : '');
     };
 
     // Component to render road segment details
@@ -459,7 +465,7 @@ export const PotholeMarkers: React.FC<PotholeMarkersProps> = ({
 
                                             {frameImages[pothole.id] ? (
                                                 <img
-                                                    src={`data:image/jpeg;base64,${frameImages[pothole.id].frame_image_base64}`}
+                                                    src={getFrameImageSrc(frameImages[pothole.id])}
                                                     alt={`Pothole Frame ${pothole.frame_number}`}
                                                     style={{
                                                         width: '100%',
@@ -476,11 +482,12 @@ export const PotholeMarkers: React.FC<PotholeMarkersProps> = ({
                                                     onClick={() => {
                                                         const imgWindow = window.open('', '_blank');
                                                         if (imgWindow) {
+                                                            const frameSrc = getFrameImageSrc(frameImages[pothole.id]);
                                                             imgWindow.document.write(`
                                                                 <html>
                                                                     <head><title>Pothole Frame ${pothole.frame_number}</title></head>
                                                                     <body style="margin:0;background:#000;display:flex;justify-content:center;align-items:center;min-height:100vh;">
-                                                                        <img src="data:image/jpeg;base64,${frameImages[pothole.id].frame_image_base64}" style="max-width:100%;max-height:100%;object-fit:contain;" alt="Pothole Frame" />
+                                                                        <img src="${frameSrc}" style="max-width:100%;max-height:100%;object-fit:contain;" alt="Pothole Frame" />
                                                                     </body>
                                                                 </html>
                                                             `);
